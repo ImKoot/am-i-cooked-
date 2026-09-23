@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Am I cooked?</title>
+  <meta name="description" content="Tell me what's going on and I'll check how toasted you are.">
+  <meta name="theme-color" content="#DCEBFA">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%9E%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #DCEBFA;
+      --card: #FFFFFF;
+      --ink: #35364F;
+      --muted: #5F6382;
+      --pink: #FF7FA0;
+      --pink-deep: #E85F86;
+      --pink-soft: #FFE3EA;
+      --mint: #CFF3E2;
+      --line: #BBD0EA;
+      --field: #F6F9FF;
+      --focus: #3D5AFE;
+      --head: "Fredoka", ui-rounded, "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", system-ui, sans-serif;
+      --body: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      background: var(--sky);
+      color: var(--ink);
+      font: 1.05rem/1.55 var(--body);
+    }
+
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .page { max-width: 34rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+
+    /* top */
+    .top { text-align: center; margin-bottom: 1.5rem; }
+    .mascot svg { width: 92px; height: auto; display: block; margin: 0 auto; }
+    h1 {
+      margin: 0.4rem 0 0.4rem;
+      font: 600 clamp(2.4rem, 10vw, 3.4rem)/1.05 var(--head);
+    }
+    .sub { margin: 0; color: var(--muted); }
+
+    /* cards */
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 30px rgba(53, 54, 79, 0.1);
+    }
+
+    label, .label { font-weight: 800; }
+
+    textarea, select {
+      width: 100%;
+      font: inherit;
+      color: var(--ink);
+      background: var(--field);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+    }
+    textarea {
+      display: block;
+      margin-top: 0.4rem;
+      padding: 0.75rem 0.9rem;
+      min-height: 6.5rem;
+      resize: vertical;
+    }
+    textarea::placeholder { color: var(--muted); opacity: 0.8; }
+    textarea[aria-invalid="true"] { border-color: var(--pink-deep); }
+    select { margin-top: 0.4rem; padding: 0.6rem 0.7rem; cursor: pointer; font-weight: 400; }
+
+    .hint { margin: 1rem 0 0.4rem; color: var(--muted); font-size: 0.95rem; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .chip {
+      font: 700 0.9rem var(--body);
+      color: var(--ink);
+      background: var(--pink-soft);
+      border: 0;
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+    }
+    .chip:hover { background: #FFD1DD; }
+
+    .row { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    @media (min-width: 32rem) { .row { grid-template-columns: 1fr 1fr; } }
+
+    .msg { min-height: 1.6rem; margin: 0.75rem 0 0.25rem; color: #B3254D; font-weight: 700; }
+
+    .go {
+      width: 100%;
+      font: 600 1.25rem var(--head);
+      color: #3A1F2B;
+      background: var(--pink);
+      border: 0;
+      border-radius: 16px;
+      padding: 0.95rem 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--pink-deep);
+    }
+    .go:hover { filter: brightness(1.05); }
+    .go:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pink-deep); }
+
+    /* result */
+    .result, .care { text-align: center; }
+    .toast-big svg { width: 170px; height: auto; display: block; margin: 0 auto; animation: pop 0.5s ease-out; }
+    @keyframes pop {
+      0% { transform: scale(0.85) rotate(-4deg); }
+      60% { transform: scale(1.05) rotate(2deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    .big { margin: 0.5rem 0 0.5rem; font: 600 clamp(2rem, 9vw, 2.7rem)/1.1 var(--head); }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 1rem;
+      font: 600 1.15rem var(--head);
+      border-radius: 999px;
+    }
+    .tagline { margin: 0.6rem 0 1rem; color: var(--muted); font-size: 1.1rem; }
+
+    .meter { display: flex; justify-content: center; gap: 0.5rem; margin: 0 0 1.25rem; }
+    .meter span { width: 26px; height: 26px; border-radius: 9px; }
+    .meter span.on { transform: scale(1.3); box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--ink); }
+
+    .result h3 { margin: 1.25rem 0 0.5rem; font: 600 1.15rem var(--head); }
+
+    .why { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+    .why li {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+      background: var(--pink-soft);
+      border-radius: 999px;
+      font-size: 0.95rem;
+    }
+    .why li.less { background: var(--mint); }
+    .why li.plain { padding-left: 0.85rem; background: var(--field); color: var(--muted); }
+    .why b {
+      min-width: 2.3rem;
+      padding: 0 0.4rem;
+      text-align: center;
+      background: #fff;
+      border-radius: 999px;
+    }
+
+    .advice { margin: 0 auto; max-width: 28rem; font-size: 1.1rem; }
+
+    .btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 1.5rem; }
+    .soft {
+      font: 700 1rem var(--body);
+      color: var(--ink);
+      background: var(--field);
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 0.55rem 1.2rem;
+      cursor: pointer;
+    }
+    .soft:hover { background: #E9F1FC; }
+
+    .care h2 { margin: 0 0 0.75rem; font: 600 1.6rem/1.2 var(--head); }
+    .care p { max-width: 28rem; margin: 0.5rem auto; }
+
+    .foot { text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .toast-big svg { animation: none; }
+      .go:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div class="mascot" id="mascot" aria-hidden="true"></div>
+      <h1>Am I cooked?</h1>
+      <p class="sub">Tell me what's going on. I'll check how toasted you are.</p>
+    </header>
+
+    <section class="card">
+      <label for="story">What's going on?</label>
+      <textarea id="story" maxlength="600" placeholder="Example: I have a test tomorrow and I haven't started studying."></textarea>
+
+      <p class="hint">Or tap one to try it:</p>
+      <div class="chips" id="chips"></div>
+
+      <div class="row">
+        <label>How much time do you have?
+          <select id="time">
+            <option value="">Not sure</option>
+            <option value="passed">It's already late</option>
+            <option value="hours">A few hours</option>
+            <option value="tomorrow">About a day</option>
+            <option value="days">A few days</option>
+            <option value="weeks">A week or more</option>
+            <option value="none">No deadline</option>
+          </select>
+        </label>
+        <label>How much is done?
+          <select id="done">
+            <option value="">Not sure</option>
+            <option value="none">Nothing yet</option>
+            <option value="little">A little</option>
+            <option value="half">About half</option>
+            <option value="most">Most of it</option>
+            <option value="all">All done</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="msg" id="msg" role="alert"></p>
+      <button type="button" class="go" id="go">Check if I'm cooked</button>
+    </section>
+
+    <section class="card result" id="result" hidden>
+      <div class="toast-big" id="toast" aria-hidden="true"></div>
+      <h2 class="big" id="big"></h2>
+      <span class="badge" id="badge"></span>
+      <p class="tagline" id="tagline"></p>
+      <div class="meter" id="meter" aria-hidden="true"></div>
+
+      <h3>Why?</h3>
+      <ul class="why" id="why"></ul>
+
+      <h3>What to do now</h3>
+      <p class="advice" id="advice"></p>
+
+      <div class="btns">
+        <button type="button" class="soft" id="copy">Copy result</button>
+        <button type="button" class="soft" id="again">Try again</button>
+      </div>
+    </section>
+
+    <section class="card care" id="care" hidden>
+      <h2>This one isn't a joke.</h2>
+      <p>It sounds like something serious might be going on. If you're in danger or thinking about hurting yourself, please call your local emergency number now (112 in the EU, 999 in the UK, 911 in the US), or talk to someone you trust.</p>
+      <p>This site is just for fun, so it can't help with that.</p>
+      <div class="btns"><button type="button" class="soft" id="care-again">Start over</button></div>
+    </section>
+
+    <p class="foot">Just for fun. Nothing you write leaves your device.</p>
+    <p class="sr" id="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ---------- The toast levels ---------- */
+
+    var LEVELS = [
+      { name: "Not cooked", min: 0, max: 19, surface: "#FBE7C0", crust: "#E8C48A",
+        tagline: "You're fine. Really.",
+        advice: [
+          "Go do it now while it's easy.",
+          "Nothing is wrong. Do the first small step and you're on your way.",
+          "Relax, but don't wait until it turns into a rush."
+        ] },
+      { name: "A little toasty", min: 20, max: 39, surface: "#F6D28E", crust: "#D9A25B",
+        tagline: "Just a bit warm. Easy to fix.",
+        advice: [
+          "Do the scariest part first.",
+          "Set a 25 minute timer and start.",
+          "Tell a friend what you're doing. It helps you actually do it."
+        ] },
+      { name: "Medium", min: 40, max: 59, surface: "#E8B36A", crust: "#C17F3E",
+        tagline: "Not great, but not doomed.",
+        advice: [
+          "Write down what's left. It's usually less than it feels.",
+          "Skip the small stuff and finish the important parts.",
+          "Put your phone away for two hours and start."
+        ] },
+      { name: "Well done", min: 60, max: 74, surface: "#C98A4B", crust: "#9C5F2A",
+        tagline: "This will take some work.",
+        advice: [
+          "Do one small piece in the next 20 minutes.",
+          "Tell whoever is waiting for you now. Early is better than late.",
+          "Get some sleep. Rested and 80% done beats tired and stuck."
+        ] },
+      { name: "Cooked", min: 75, max: 89, surface: "#97602F", crust: "#6B3E1B",
+        tagline: "Yep. You're cooked.",
+        advice: [
+          "Make three lists: must do, can be late, can skip.",
+          "Ask for help or more time before the deadline, not after.",
+          "Just start. A messy first try beats a perfect plan."
+        ] },
+      { name: "Burnt", min: 90, max: 100, surface: "#4A3226", crust: "#2E1C13",
+        tagline: "Very cooked. Open a window.",
+        advice: [
+          "Stop, and don't make it worse. Find out what really happened.",
+          "Tell the people it affects, plainly and honestly. Then fix it.",
+          "Breathe. Write down what happened, then fix one thing at a time."
+        ] }
+    ];
+
+    var TIME = {
+      passed:   { w: 30,  why: "It's already late" },
+      hours:    { w: 22,  why: "You only have hours" },
+      tomorrow: { w: 14,  why: "It's due in about a day" },
+      days:     { w: 4,   why: "You have a few days" },
+      weeks:    { w: -8,  why: "You have a week or more" },
+      none:     { w: -12, why: "There's no deadline" }
+    };
+
+    var DONE = {
+      none:   { w: 16,  why: "You haven't started" },
+      little: { w: 8,   why: "You've barely started" },
+      half:   { w: 0,   why: "" },
+      most:   { w: -10, why: "Most of it is done" },
+      all:    { w: -20, why: "It's all done" }
+    };
+
+    /* Each rule: re = pattern (on lowercase text), w = points, why = reason shown.
+       time / progress = skip this rule if that dropdown was used. */
+    var RULES = [
+      // time
+      { time: true, re: /\b(was due|were due|already (passed|due)|missed (the|my) deadline|deadline (has )?passed)\b/, w: 26, why: "It's already late" },
+      { time: true, re: /\b(tonight|tomorrow|today|this (morning|afternoon|evening)|in (an?|one|two|three|\d+) (hours?|hrs?|minutes?|mins?)|right now|asap)\b/, w: 14, why: "Time is almost up" },
+      { time: true, re: /\b(next (week|month|semester|year)|in (a )?(few|couple( of)?|\d+) (weeks|months))\b/, w: -8, why: "The deadline is far away" },
+
+      // school
+      { re: /\b(exams?|finals?|midterms?|quiz(zes)?|viva|orals?)\b/, w: 8, why: "There's a test" },
+      { re: /\b(thesis|dissertation)\b/, w: 8, why: "It's a big project" },
+      { progress: true, re: /\b(haven'?t|hasn'?t|have not|never|didn'?t|did not|not yet|yet to)\s+(even\s+)?(started|begun|start|studied|study|opened|read|attended|prepared|written|write|looked|touched)\b|\b(not started|zero progress|nothing (is )?(done|written))\b/, w: 18, why: "You haven't started" },
+      { re: /\b(all[- ]?nighter|no sleep|haven'?t slept|didn'?t sleep|running on (coffee|caffeine|fumes|energy drinks?)|sleep[- ]deprived)\b/, w: 10, why: "You didn't sleep" },
+      { re: /\b(fail(ed|ing)?|flunk(ed|ing)?|retake|resit|academic probation)\b/, w: 12, why: "You might fail" },
+
+      // work
+      { re: /\b(boss|manager|ceo|clients?|investors?)\b/, w: 5, why: "Someone important is watching" },
+      { re: /\b(deadline|due|launch|release|demo)\b/, w: 5, why: "There's a deadline" },
+      { re: /\b(laid off|layoffs?|fired|redundan(t|cy)|performance improvement plan)\b/, w: 16, why: "Your job might be at risk" },
+      { re: /\b(repl(y|ied)[- ]?all|wrong (person|channel|group|chat|thread)|sent (it |that |this )?to (everyone|everybody|the wrong)|(whole|entire) company)\b/, w: 16, why: "A message went to the wrong people" },
+      { re: /\bmeant for (someone|somebody|my|a|the)\b/, w: 8, why: "It wasn't meant for them" },
+      { re: /\b(drop table|rm -rf|force[- ]?push(ed)?|deleted (the |our |my )?(prod(uction)?|database|db|repo|repository)|dropped (the |our )?(prod(uction)?|database|db))\b/, w: 30, why: "Something got deleted for good" },
+      { re: /\b(prod|production|the site|the server|our servers?|the website)\b.{0,40}\b(down|crash(ed|ing)?|on fire|broken|melting)\b/, w: 18, why: "The site is broken" },
+      { re: /\b(no back-?ups?|without (a )?back-?ups?|(don'?t|didn'?t|never|can'?t) (have|find|make) (a )?back-?ups?)\b/, w: 15, why: "There's no backup" },
+
+      // money
+      { re: /\b(i'?m broke|am broke|flat broke|overdrawn|overdraft(ed)?|in debt|maxed[- ]out|can'?t (afford|pay)|behind on (rent|payments?|bills)|evict(ed|ion)|bankrupt(cy)?)\b/, w: 16, why: "Money is tight" },
+      { re: /\b(taxes|tax bill|audit|penalty|late fees?)\b/, w: 8, why: "Taxes or fees are involved" },
+
+      // people
+      { re: /\b(my ex|texted (my )?ex|left on read|on read|ghosted|read receipts?)\b/, w: 10, why: "An ex or a \"read\" is involved" },
+      { re: /\b(wrong name|forgot (our |her |his |their |my )?(anniversary|birthday)|missed (our |her |his |their |my )?(anniversary|birthday))\b/, w: 16, why: "You forgot something important" },
+      { re: /\b(in-?laws?|(girlfriend|boyfriend|partner)'?s (parents|mom|dad|mum))\b/, w: 4, why: "Parents are involved" },
+      { re: /\b(cheat(ed|ing)?|caught (me|you|him|her|them)|found out|busted|got caught)\b/, w: 10, why: "Someone found out" },
+      { re: /\b(lied|lying|lie to)\b/, w: 8, why: "There's a lie in there" },
+      { re: /\b(drunk|tipsy|wasted|[1-4] ?am)\b/, w: 6, why: "Late night choices" },
+
+      // everyday
+      { re: /\b(hungover|hangover)\b/, w: 6, why: "You have a hangover" },
+      { re: /\b(sick|flu|fever|covid)\b/, w: 6, why: "You're not feeling well" },
+      { re: /\b(missed|miss|late for|running late for) (my |the |our )?(flight|train|bus|interview|meeting|exam|class)\b/, w: 18, why: "You missed something important" },
+      { re: /\b(lost|forgot|left)( my| the)? (passport|wallet|keys?|phone|laptop|charger|id)\b/, w: 12, why: "You lost something you need" },
+      { re: /\b(car (broke|died|won'?t start)|flat tire|crash(ed)? (my|the) car)\b/, w: 10, why: "Car trouble" },
+      { re: /\b(deleted|lost|overwrote|overwritten|corrupted) (the |my |all |our )?(files?|work|essay|project|document|draft|photos)\b/, w: 14, why: "You lost your work" },
+      { re: /\b(didn'?t|did not|forgot to|forgot) (to )?save\b/, w: 14, why: "You didn't save" },
+      { re: /\bno extensions?\b/, w: 8, why: "There's no extension" },
+
+      // things that help (ignored if the words before them say "no" or "not")
+      { re: /\bextension\b/, w: -15, why: "You have an extension" },
+      { progress: true, re: /\b(almost|nearly|mostly|pretty much) (done|finished|there|complete)|halfway|half[- ]?(done|way)|\d{2}% (done|complete)/, w: -12, why: "You're almost there" },
+      { re: /\b(plenty of|lots of|loads of|enough|got) time\b/, w: -14, why: "You have time" },
+      { re: /\b(prepared|ready|studied|already (finished|submitted|sent|done)|submitted)\b/, w: -8, why: "You're somewhat ready" },
+      { re: /\b(backed up|back-?ups? (exist|available|saved)|(have|got|there'?s|there is) a back-?up)\b/, w: -14, why: "You have a backup" },
+      { re: /\b(understanding|forgiving|supportive|sympathetic|laid[- ]back)\b/, w: -8, why: "Someone is on your side" },
+      { re: /\b(ungraded|optional|low[- ]stakes|worth (nothing|0%|1%|2%|5%)|just a (quiz|draft|homework)|dry run)\b/, w: -10, why: "It doesn't count for much" },
+      { re: /\b(apolog(i[sz]ed|y)|explained|talked (to|with)|told (them|him|her|my))\b/, w: -6, why: "You're already talking about it" },
+      { re: /\b((friends?|teammates?|colleagues?|classmates?) (will|can|are going to|is going to) help|got help|getting help)\b/, w: -8, why: "You have help" },
+      { re: /\b(refundable|reversible|can undo|undo it|rollback|roll back|revert(ed)?)\b/, w: -10, why: "It can be undone" }
+    ];
+
+    // Words that mean this is not a joke topic.
+    var SERIOUS = /\b(kill(ing)? myself|suicid\w*|self[- ]?harm|want to die|end it all|hurt myself|overdos\w*|chest pain|can'?t breathe|being abused|domestic violence)\b/;
+
+    var EXAMPLES = [
+      { label: "Test tomorrow", text: "I have a chem final tomorrow at 9 and I haven't opened the textbook." },
+      { label: "Deleted everything", text: "I deleted the prod database and there are no backups. My boss is asking why the site is down." },
+      { label: "Reply-all oops", text: "I replied all to the entire company with a joke meant for my friend." },
+      { label: "Texted my ex", text: "I texted my ex at 2am and got left on read." },
+      { label: "Essay, got extension", text: "Essay due next week and I'm about halfway done, plus I have an extension." }
+    ];
+
+    /* ---------- Working out the score ---------- */
+
+    function clean(text) {
+      return String(text || "")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+    }
+
+    // Turns text into a number so the same text always gives the same result.
+    function hash(str) {
+      var h = 2166136261;
+      for (var i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    // True if "no" or "not" comes right before the match ("no extension", "not ready").
+    function negated(text, index) {
+      var before = text.slice(Math.max(0, index - 16), index);
+      return /\b(not|no|never|isn'?t|wasn'?t|aren'?t|don'?t|doesn'?t|haven'?t|hasn'?t|nothing)\s*(\w+\s+)?$/.test(before);
+    }
+
+    function levelIndex(score) {
+      for (var i = LEVELS.length - 1; i >= 0; i--) {
+        if (score >= LEVELS[i].min) return i;
+      }
+      return 0;
+    }
+
+    function assess(rawText, timeKey, doneKey) {
+      var text = clean(rawText);
+      if (text.length < 8) return { error: "Write a little more first. One sentence is fine." };
+      if (SERIOUS.test(text)) return { serious: true };
+
+      var time = TIME[timeKey] || null;
+      var done = DONE[doneKey] || null;
+      var reasons = [];
+      var total = 0;
+
+      function add(why, points) {
+        reasons.push({ why: why, points: points });
+        total += points;
+      }
+
+      if (time) add(time.why, time.w);
+      if (done && done.w !== 0) add(done.why, done.w);
+
+      for (var i = 0; i < RULES.length; i++) {
+        var rule = RULES[i];
+        if (rule.time && time) continue;
+        if (rule.progress && done) continue;
+        var found = rule.re.exec(text);
+        if (!found) continue;
+        if (rule.w < 0 && negated(text, found.index)) continue;
+        add(rule.why, rule.w);
+      }
+
+      var h = hash(text);
+      var raw = 30 + total + ((h % 7) - 3);
+      var score = raw > 75 ? 75 + (raw - 75) * 0.7 : raw;
+      score = Math.max(1, Math.min(100, Math.round(score)));
+
+      reasons.sort(function (a, b) { return Math.abs(b.points) - Math.abs(a.points); });
+      var level = levelIndex(score);
+
+      return {
+        score: score,
+        level: level,
+        reasons: reasons.slice(0, 6),
+        advice: LEVELS[level].advice[(h >>> 3) % 3]
+      };
+    }
+
+    /* ---------- Drawing the toast ---------- */
+
+    function toastSVG(level) {
+      var L = LEVELS[level];
+      var ink = level >= 4 ? "#FFF3E0" : "#4B2E1E";
+      var dark = "#2E1C13";
+      var body = "M 40 72 C 20 72, 16 42, 44 33 C 70 24, 130 24, 156 33 C 184 42, 180 72, 160 72 L 160 166 Q 160 180 146 180 L 54 180 Q 40 180 40 166 Z";
+
+      var dots = '<circle cx="80" cy="102" r="5.5" fill="' + ink + '"/><circle cx="120" cy="102" r="5.5" fill="' + ink + '"/>';
+      var cheeks = '<circle cx="64" cy="118" r="7" fill="#FF8FAB" opacity=".6"/><circle cx="136" cy="118" r="7" fill="#FF8FAB" opacity=".6"/>';
+      var line = 'fill="none" stroke="' + ink + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"';
+      var drop = function (x, y) {
+        return '<path d="M ' + x + ' ' + y + ' Q ' + (x + 10) + ' ' + (y + 16) + ' ' + x + ' ' + (y + 20) + ' Q ' + (x - 10) + ' ' + (y + 16) + ' ' + x + ' ' + y + ' Z" fill="#8FD3FF"/>';
+      };
+      var wisp = function (x) {
+        return '<path d="M ' + x + ' 18 C ' + (x - 12) + ' 10, ' + (x + 12) + ' 2, ' + x + ' -8" fill="none" stroke="#B7BCD0" stroke-width="5" stroke-linecap="round"/>';
+      };
+
+      var face = "";
+      var extra = "";
+      if (level === 0) {
+        face = dots + '<path d="M 86 118 Q 100 134 114 118" ' + line + '/>' + cheeks;
+      } else if (level === 1) {
+        face = dots + '<path d="M 88 121 Q 100 130 112 121" ' + line + '/>' + cheeks;
+      } else if (level === 2) {
+        face = dots + '<path d="M 88 124 L 112 124" ' + line + '/>';
+      } else if (level === 3) {
+        face = dots +
+          '<path d="M 70 95 L 90 89 M 130 95 L 110 89" ' + line + '/>' +
+          '<path d="M 86 126 Q 93 119 100 126 T 114 126" ' + line + '/>';
+        extra = drop(148, 72);
+      } else if (level === 4) {
+        face =
+          '<circle cx="80" cy="100" r="10" fill="#fff"/><circle cx="120" cy="100" r="10" fill="#fff"/>' +
+          '<circle cx="80" cy="102" r="4" fill="' + dark + '"/><circle cx="120" cy="102" r="4" fill="' + dark + '"/>' +
+          '<ellipse cx="100" cy="126" rx="8" ry="10" fill="' + dark + '"/>';
+        extra = drop(46, 74) + drop(154, 74) + wisp(100);
+      } else {
+        face =
+          '<path d="M 73 95 L 87 109 M 87 95 L 73 109 M 113 95 L 127 109 M 127 95 L 113 109" ' + line + '/>' +
+          '<path d="M 84 128 Q 92 120 100 128 T 116 128" ' + line + '/>';
+        extra = wisp(78) + wisp(122);
+      }
+
+      return '<svg viewBox="0 -14 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cartoon slice of toast">' +
+        '<path d="' + body + '" fill="' + L.crust + '"/>' +
+        '<g transform="translate(100 104) scale(.84) translate(-100 -104)"><path d="' + body + '" fill="' + L.surface + '"/></g>' +
+        face + extra + '</svg>';
+    }
+
+    /* ---------- The page ---------- */
+
+    var $ = function (id) { return document.getElementById(id); };
+    var story = $("story"), time = $("time"), done = $("done"), msg = $("msg");
+    var result = $("result"), care = $("care"), copyBtn = $("copy");
+    var last = null;
+    var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    $("mascot").innerHTML = toastSVG(0);
+
+    EXAMPLES.forEach(function (ex) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = ex.label;
+      b.addEventListener("click", function () {
+        story.value = ex.text;
+        time.value = "";
+        done.value = "";
+        check();
+      });
+      $("chips").appendChild(b);
+    });
+
+    LEVELS.forEach(function (l) {
+      var s = document.createElement("span");
+      s.style.background = l.surface;
+      $("meter").appendChild(s);
+    });
+
+    function scrollTo(el) {
+      el.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
+    }
+
+    function showResult(res) {
+      var L = LEVELS[res.level];
+      last = { score: res.score, name: L.name };
+
+      care.hidden = true;
+      result.hidden = false;
+
+      $("toast").innerHTML = toastSVG(res.level);
+      $("big").textContent = "You're " + res.score + "% cooked";
+      var badge = $("badge");
+      badge.textContent = L.name;
+      badge.style.background = L.surface;
+      badge.style.color = res.level >= 4 ? "#FFF3E0" : "#3A2416";
+      $("tagline").textContent = L.tagline;
+
+      Array.prototype.forEach.call($("meter").children, function (s, i) {
+        s.className = i === res.level ? "on" : "";
+      });
+
+      var list = $("why");
+      list.textContent = "";
+      if (res.reasons.length === 0) {
+        var li = document.createElement("li");
+        li.className = "plain";
+        li.textContent = "Nothing stood out. Add more details for a better guess.";
+        list.appendChild(li);
+      } else {
+        res.reasons.forEach(function (r) {
+          var li = document.createElement("li");
+          if (r.points < 0) li.className = "less";
+          var num = document.createElement("b");
+          num.textContent = (r.points > 0 ? "+" : "\u2212") + Math.abs(r.points);
+          li.appendChild(num);
+          li.appendChild(document.createTextNode(r.why));
+          list.appendChild(li);
+        });
+      }
+
+      $("advice").textContent = res.advice;
+      copyBtn.textContent = "Copy result";
+      $("status").textContent = "You're " + res.score + " percent cooked. " + L.name + ". " + L.tagline;
+      scrollTo(result);
+    }
+
+    function check() {
+      msg.textContent = "";
+      story.removeAttribute("aria-invalid");
+      try {
+        var res = assess(story.value, time.value, done.value);
+        if (res.error) {
+          msg.textContent = res.error;
+          story.setAttribute("aria-invalid", "true");
+          story.focus();
+        } else if (res.serious) {
+          result.hidden = true;
+          care.hidden = false;
+          $("status").textContent = "This one isn't a joke. Please read the message on the page.";
+          scrollTo(care);
+        } else {
+          showResult(res);
+        }
+      } catch (err) {
+        msg.textContent = "Something went wrong. Try reloading the page.";
+      }
+    }
+
+    function reset() {
+      story.value = "";
+      time.value = "";
+      done.value = "";
+      msg.textContent = "";
+      result.hidden = true;
+      care.hidden = true;
+      last = null;
+      window.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
+      story.focus();
+    }
+
+    $("go").addEventListener("click", check);
+    $("again").addEventListener("click", reset);
+    $("care-again").addEventListener("click", reset);
+
+    story.addEventListener("input", function () {
+      msg.textContent = "";
+      story.removeAttribute("aria-invalid");
+    });
+    story.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        check();
+      }
+    });
+
+    copyBtn.addEventListener("click", function () {
+      if (!last) return;
+      var text = "I'm " + last.score + "% cooked (" + last.name + "). Check yours: " + location.href.split("#")[0];
+      var flash = function (label) {
+        copyBtn.textContent = label;
+        setTimeout(function () { copyBtn.textContent = "Copy result"; }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash("Copied!"); }, function () { flash("Couldn't copy"); });
+      } else {
+        flash("Couldn't copy");
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
