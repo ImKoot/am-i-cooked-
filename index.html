@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Am I Cooked?</title>
+<meta name="description" content="Type your problem. The Cook-O-Tron 3000 tells you if you are cooked.">
+<style>
+  body {
+    margin: 0;
+    padding: 10px;
+    background: #008080;
+    color: #000;
+    font: 17px/1.4 "Times New Roman", Times, serif;
+  }
+  .main {
+    max-width: 620px;
+    margin: 10px auto;
+    padding: 12px 14px;
+    background: #fff;
+    border: 4px ridge #c0c0c0;
+  }
+  marquee {
+    display: block;
+    padding: 3px 0;
+    background: #000;
+    color: #0f0;
+    font: bold 14px "Courier New", Courier, monospace;
+  }
+  h1 {
+    margin: 12px 0 4px;
+    text-align: center;
+    color: #f00;
+    font: bold 46px/1.05 "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  }
+  h2 { margin: 6px 0; font-size: 22px; }
+  .center { text-align: center; }
+  .small { font-size: 14px; }
+  hr { border: 0; border-top: 3px double #808080; margin: 14px 0; }
+
+  .blink { animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { visibility: hidden; } }
+
+  label { font-weight: bold; }
+  textarea, select {
+    width: 100%;
+    margin-top: 3px;
+    padding: 4px;
+    font: 15px "Courier New", Courier, monospace;
+    color: #000;
+    background: #fff;
+    border: 2px inset #808080;
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+  textarea { display: block; min-height: 90px; resize: vertical; }
+  .two { display: table; width: 100%; border-spacing: 0 0; margin-top: 10px; }
+  .two label { display: table-cell; width: 50%; padding-right: 8px; }
+  .two label + label { padding: 0 0 0 8px; }
+  @media (max-width: 480px) {
+    .two, .two label { display: block; width: auto; padding: 0 !important; }
+    .two label { margin-bottom: 8px; }
+  }
+
+  button {
+    font: bold 16px Arial, Helvetica, sans-serif;
+    color: #000;
+    background: #c0c0c0;
+    border: 3px outset #fff;
+    border-radius: 0;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  button:active { border-style: inset; }
+  #go { display: block; margin: 14px auto 0; font-size: 20px; padding: 8px 22px; }
+
+  #msg { min-height: 22px; margin: 6px 0 0; color: #c00; font-weight: bold; }
+
+  .box { border: 3px ridge #c0c0c0; padding: 10px; background: #ffffe0; }
+  .face { font-size: 64px; line-height: 1.1; }
+  .big {
+    margin: 4px 0;
+    color: #c00;
+    font: bold 34px/1.1 "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  }
+  .bar { margin: 8px 0; font: bold 18px "Courier New", Courier, monospace; letter-spacing: 1px; word-break: break-all; }
+  .scale { width: 100%; border-collapse: collapse; margin: 8px 0; font: 11px Arial, Helvetica, sans-serif; text-align: center; }
+  .scale td { border: 1px solid #000; padding: 3px 1px; background: #fff; }
+  .scale td.on { background: #ff0; font-weight: bold; border: 3px solid #f00; }
+  ul.why { margin: 4px 0; padding-left: 22px; text-align: left; }
+  .wait { font: bold 15px "Courier New", Courier, monospace; }
+
+  .counter {
+    display: inline-block;
+    padding: 1px 6px;
+    background: #000;
+    color: #0f0;
+    font: bold 16px "Courier New", Courier, monospace;
+    letter-spacing: 2px;
+    border: 2px inset #808080;
+  }
+  a { color: #0000ee; }
+  a:visited { color: #551a8b; }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { .blink { animation: none; } marquee { display: none; } }
+</style>
+</head>
+<body>
+<div class="main">
+
+  <marquee scrollamount="6">*** WELCOME TO AM-I-COOKED *** THE #1 WEBSITE FOR FINDING OUT IF YOU ARE COOKED *** BEST VIEWED IN ANY BROWSER *** </marquee>
+
+  <h1>&#128293; Am I Cooked? &#128293;</h1>
+  <p class="center"><b>Type your problem below.</b><br>The Cook-O-Tron 3000 will tell you if you are cooked. <span class="blink" style="color:#c00"><b>NEW!</b></span></p>
+
+  <hr>
+
+  <label for="story">1. What is going on?</label>
+  <textarea id="story" maxlength="600"></textarea>
+  <p class="small">Try one: <span id="examples"></span></p>
+
+  <div class="two">
+    <label>2. How much time do you have?
+      <select id="time">
+        <option value="">not sure</option>
+        <option value="passed">it's already late</option>
+        <option value="hours">a few hours</option>
+        <option value="tomorrow">about a day</option>
+        <option value="days">a few days</option>
+        <option value="weeks">a week or more</option>
+        <option value="none">no deadline</option>
+      </select>
+    </label>
+    <label>3. How much is done?
+      <select id="done">
+        <option value="">not sure</option>
+        <option value="none">nothing yet</option>
+        <option value="little">a little</option>
+        <option value="half">about half</option>
+        <option value="most">most of it</option>
+        <option value="all">all done</option>
+      </select>
+    </label>
+  </div>
+
+  <p id="msg" role="alert"></p>
+  <button type="button" id="go">CHECK IF I'M COOKED</button>
+
+  <p id="wait" class="wait center" hidden></p>
+
+  <div id="result" hidden>
+    <hr>
+    <div class="box center">
+      <div class="face" id="face" aria-hidden="true"></div>
+      <div class="big" id="big"></div>
+      <h2 id="verdict"></h2>
+      <div id="tagline"></div>
+      <div class="bar" id="bar" aria-hidden="true"></div>
+      <table class="scale" id="scale" aria-hidden="true"><tr></tr></table>
+    </div>
+
+    <h2>Why?</h2>
+    <ul class="why" id="why"></ul>
+
+    <h2>What the computer says to do:</h2>
+    <p id="advice"></p>
+
+    <p class="center">
+      <button type="button" id="copy">Copy result</button>
+      <button type="button" id="again">Try again</button>
+    </p>
+  </div>
+
+  <div id="care" hidden>
+    <hr>
+    <div class="box">
+      <h2>Hold on.</h2>
+      <p>This one doesn't sound funny. If you are in danger or thinking about hurting yourself, please call your local emergency number right now (112 in the EU, 999 in the UK, 911 in the US) or talk to someone you trust.</p>
+      <p>This website is just a dumb game and can't help with that.</p>
+      <p class="center"><button type="button" id="care-again">Start over</button></p>
+    </div>
+  </div>
+
+  <hr>
+  <p class="center small">
+    You are visitor number<br>
+    <span class="counter" id="counter">001337</span>
+  </p>
+  <p class="center small">
+    Made in Notepad. For fun only. Nothing you type leaves your computer.<br>
+    &copy; 2026 am-i-cooked. All rights reserved lol
+  </p>
+  <p class="sr" id="status" aria-live="polite"></p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var LEVELS = [
+    { name: "NOT COOKED", face: "\uD83D\uDE04", min: 0, max: 19,
+      tagline: "You're fine. Go touch grass.",
+      advice: [
+        "Just do the thing. It'll take like ten minutes, be honest.",
+        "Nothing is wrong. Do the first small step and go about your day.",
+        "Relax, but don't wait until it becomes a rush."
+      ] },
+    { name: "LIGHTLY TOASTED", face: "\uD83D\uDE42", min: 20, max: 39,
+      tagline: "A little warm. Nothing a snack can't fix.",
+      advice: [
+        "Do the scariest part first.",
+        "Set a 25 minute timer and start.",
+        "Tell a friend what you're doing. It helps you actually do it."
+      ] },
+    { name: "MEDIUM", face: "\uD83D\uDE10", min: 40, max: 59,
+      tagline: "Eh. Could be worse.",
+      advice: [
+        "Write down what's left. It's usually less than it feels.",
+        "Skip the small stuff and finish the important parts.",
+        "Put your phone in another room for two hours and start."
+      ] },
+    { name: "WELL DONE", face: "\uD83D\uDE2C", min: 60, max: 74,
+      tagline: "Yikes. Time to lock in.",
+      advice: [
+        "Do one small piece in the next 20 minutes.",
+        "Tell whoever is waiting for you now. Early is better than late.",
+        "Get some sleep. Rested and 80% done beats tired and stuck."
+      ] },
+    { name: "COOKED", face: "\uD83D\uDE35", min: 75, max: 89,
+      tagline: "Yep. Cooked.",
+      advice: [
+        "Make three lists: must do, can be late, can skip.",
+        "Ask for help or more time before the deadline, not after.",
+        "Just start. A messy first try beats a perfect plan."
+      ] },
+    { name: "BURNT TO A CRISP", face: "\uD83D\uDC80", min: 90, max: 100,
+      tagline: "It's over. Open a window.",
+      advice: [
+        "Stop, and don't make it worse. Find out what really happened.",
+        "Tell the people it affects, plainly and honestly. Then fix it.",
+        "Breathe. Write down what happened, then fix one thing at a time."
+      ] }
+  ];
+
+    var TIME = {
+      passed:   { w: 30,  why: "It's already late" },
+      hours:    { w: 22,  why: "You only have hours" },
+      tomorrow: { w: 14,  why: "It's due in about a day" },
+      days:     { w: 4,   why: "You have a few days" },
+      weeks:    { w: -8,  why: "You have a week or more" },
+      none:     { w: -12, why: "There's no deadline" }
+    };
+
+    var DONE = {
+      none:   { w: 16,  why: "You haven't started" },
+      little: { w: 8,   why: "You've barely started" },
+      half:   { w: 0,   why: "" },
+      most:   { w: -10, why: "Most of it is done" },
+      all:    { w: -20, why: "It's all done" }
+    };
+
+    /* Each rule: re = pattern (on lowercase text), w = points, why = reason shown.
+       time / progress = skip this rule if that dropdown was used. */
+    var RULES = [
+      // time
+      { time: true, re: /\b(was due|were due|already (passed|due)|missed (the|my) deadline|deadline (has )?passed)\b/, w: 26, why: "It's already late" },
+      { time: true, re: /\b(tonight|tomorrow|today|this (morning|afternoon|evening)|in (an?|one|two|three|\d+) (hours?|hrs?|minutes?|mins?)|right now|asap)\b/, w: 14, why: "Time is almost up" },
+      { time: true, re: /\b(next (week|month|semester|year)|in (a )?(few|couple( of)?|\d+) (weeks|months))\b/, w: -8, why: "The deadline is far away" },
+
+      // school
+      { re: /\b(exams?|finals?|midterms?|quiz(zes)?|viva|orals?)\b/, w: 8, why: "There's a test" },
+      { re: /\b(thesis|dissertation)\b/, w: 8, why: "It's a big project" },
+      { progress: true, re: /\b(haven'?t|hasn'?t|have not|never|didn'?t|did not|not yet|yet to)\s+(even\s+)?(started|begun|start|studied|study|opened|read|attended|prepared|written|write|looked|touched)\b|\b(not started|zero progress|nothing (is )?(done|written))\b/, w: 18, why: "You haven't started" },
+      { re: /\b(all[- ]?nighter|no sleep|haven'?t slept|didn'?t sleep|running on (coffee|caffeine|fumes|energy drinks?)|sleep[- ]deprived)\b/, w: 10, why: "You didn't sleep" },
+      { re: /\b(fail(ed|ing)?|flunk(ed|ing)?|retake|resit|academic probation)\b/, w: 12, why: "You might fail" },
+
+      // work
+      { re: /\b(boss|manager|ceo|clients?|investors?)\b/, w: 5, why: "Someone important is watching" },
+      { re: /\b(deadline|due|launch|release|demo)\b/, w: 5, why: "There's a deadline" },
+      { re: /\b(laid off|layoffs?|fired|redundan(t|cy)|performance improvement plan)\b/, w: 16, why: "Your job might be at risk" },
+      { re: /\b(repl(y|ied)[- ]?all|wrong (person|channel|group|chat|thread)|sent (it |that |this )?to (everyone|everybody|the wrong)|(whole|entire) company)\b/, w: 16, why: "A message went to the wrong people" },
+      { re: /\bmeant for (someone|somebody|my|a|the)\b/, w: 8, why: "It wasn't meant for them" },
+      { re: /\b(drop table|rm -rf|force[- ]?push(ed)?|deleted (the |our |my )?(prod(uction)?|database|db|repo|repository)|dropped (the |our )?(prod(uction)?|database|db))\b/, w: 30, why: "Something got deleted for good" },
+      { re: /\b(prod|production|the site|the server|our servers?|the website)\b.{0,40}\b(down|crash(ed|ing)?|on fire|broken|melting)\b/, w: 18, why: "The site is broken" },
+      { re: /\b(no back-?ups?|without (a )?back-?ups?|(don'?t|didn'?t|never|can'?t) (have|find|make) (a )?back-?ups?)\b/, w: 15, why: "There's no backup" },
+
+      // money
+      { re: /\b(i'?m broke|am broke|flat broke|overdrawn|overdraft(ed)?|in debt|maxed[- ]out|can'?t (afford|pay)|behind on (rent|payments?|bills)|evict(ed|ion)|bankrupt(cy)?)\b/, w: 16, why: "Money is tight" },
+      { re: /\b(taxes|tax bill|audit|penalty|late fees?)\b/, w: 8, why: "Taxes or fees are involved" },
+
+      // people
+      { re: /\b(my ex|texted (my )?ex|left on read|on read|ghosted|read receipts?)\b/, w: 10, why: "An ex or a \"read\" is involved" },
+      { re: /\b(wrong name|forgot (our |her |his |their |my )?(anniversary|birthday)|missed (our |her |his |their |my )?(anniversary|birthday))\b/, w: 16, why: "You forgot something important" },
+      { re: /\b(in-?laws?|(girlfriend|boyfriend|partner)'?s (parents|mom|dad|mum))\b/, w: 4, why: "Parents are involved" },
+      { re: /\b(cheat(ed|ing)?|caught (me|you|him|her|them)|found out|busted|got caught)\b/, w: 10, why: "Someone found out" },
+      { re: /\b(lied|lying|lie to)\b/, w: 8, why: "There's a lie in there" },
+      { re: /\b(drunk|tipsy|wasted|[1-4] ?am)\b/, w: 6, why: "Late night choices" },
+
+      // everyday
+      { re: /\b(hungover|hangover)\b/, w: 6, why: "You have a hangover" },
+      { re: /\b(sick|flu|fever|covid)\b/, w: 6, why: "You're not feeling well" },
+      { re: /\b(missed|miss|late for|running late for) (my |the |our )?(flight|train|bus|interview|meeting|exam|class)\b/, w: 18, why: "You missed something important" },
+      { re: /\b(lost|forgot|left)( my| the)? (passport|wallet|keys?|phone|laptop|charger|id)\b/, w: 12, why: "You lost something you need" },
+      { re: /\b(car (broke|died|won'?t start)|flat tire|crash(ed)? (my|the) car)\b/, w: 10, why: "Car trouble" },
+      { re: /\b(deleted|lost|overwrote|overwritten|corrupted) (the |my |all |our )?(files?|work|essay|project|document|draft|photos)\b/, w: 14, why: "You lost your work" },
+      { re: /\b(didn'?t|did not|forgot to|forgot) (to )?save\b/, w: 14, why: "You didn't save" },
+      { re: /\bno extensions?\b/, w: 8, why: "There's no extension" },
+
+      // things that help (ignored if the words before them say "no" or "not")
+      { re: /\bextension\b/, w: -15, why: "You have an extension" },
+      { progress: true, re: /\b(almost|nearly|mostly|pretty much) (done|finished|there|complete)|halfway|half[- ]?(done|way)|\d{2}% (done|complete)/, w: -12, why: "You're almost there" },
+      { re: /\b(plenty of|lots of|loads of|enough|got) time\b/, w: -14, why: "You have time" },
+      { re: /\b(prepared|ready|studied|already (finished|submitted|sent|done)|submitted)\b/, w: -8, why: "You're somewhat ready" },
+      { re: /\b(backed up|back-?ups? (exist|available|saved)|(have|got|there'?s|there is) a back-?up)\b/, w: -14, why: "You have a backup" },
+      { re: /\b(understanding|forgiving|supportive|sympathetic|laid[- ]back)\b/, w: -8, why: "Someone is on your side" },
+      { re: /\b(ungraded|optional|low[- ]stakes|worth (nothing|0%|1%|2%|5%)|just a (quiz|draft|homework)|dry run)\b/, w: -10, why: "It doesn't count for much" },
+      { re: /\b(apolog(i[sz]ed|y)|explained|talked (to|with)|told (them|him|her|my))\b/, w: -6, why: "You're already talking about it" },
+      { re: /\b((friends?|teammates?|colleagues?|classmates?) (will|can|are going to|is going to) help|got help|getting help)\b/, w: -8, why: "You have help" },
+      { re: /\b(refundable|reversible|can undo|undo it|rollback|roll back|revert(ed)?)\b/, w: -10, why: "It can be undone" }
+    ];
+
+    // Words that mean this is not a joke topic.
+    var SERIOUS = /\b(kill(ing)? myself|suicid\w*|self[- ]?harm|want to die|end it all|hurt myself|overdos\w*|chest pain|can'?t breathe|being abused|domestic violence)\b/;
+
+    var EXAMPLES = [
+      { label: "Test tomorrow", text: "I have a chem final tomorrow at 9 and I haven't opened the textbook." },
+      { label: "Deleted everything", text: "I deleted the prod database and there are no backups. My boss is asking why the site is down." },
+      { label: "Reply-all oops", text: "I replied all to the entire company with a joke meant for my friend." },
+      { label: "Texted my ex", text: "I texted my ex at 2am and got left on read." },
+      { label: "Essay, got extension", text: "Essay due next week and I'm about halfway done, plus I have an extension." }
+    ];
+
+    /* ---------- Working out the score ---------- */
+
+    function clean(text) {
+      return String(text || "")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+    }
+
+    // Turns text into a number so the same text always gives the same result.
+    function hash(str) {
+      var h = 2166136261;
+      for (var i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    // True if "no" or "not" comes right before the match ("no extension", "not ready").
+    function negated(text, index) {
+      var before = text.slice(Math.max(0, index - 16), index);
+      return /\b(not|no|never|isn'?t|wasn'?t|aren'?t|don'?t|doesn'?t|haven'?t|hasn'?t|nothing)\s*(\w+\s+)?$/.test(before);
+    }
+
+    function levelIndex(score) {
+      for (var i = LEVELS.length - 1; i >= 0; i--) {
+        if (score >= LEVELS[i].min) return i;
+      }
+      return 0;
+    }
+
+    function assess(rawText, timeKey, doneKey) {
+      var text = clean(rawText);
+      if (text.length < 8) return { error: "Write a little more first. One sentence is fine." };
+      if (SERIOUS.test(text)) return { serious: true };
+
+      var time = TIME[timeKey] || null;
+      var done = DONE[doneKey] || null;
+      var reasons = [];
+      var total = 0;
+
+      function add(why, points) {
+        reasons.push({ why: why, points: points });
+        total += points;
+      }
+
+      if (time) add(time.why, time.w);
+      if (done && done.w !== 0) add(done.why, done.w);
+
+      for (var i = 0; i < RULES.length; i++) {
+        var rule = RULES[i];
+        if (rule.time && time) continue;
+        if (rule.progress && done) continue;
+        var found = rule.re.exec(text);
+        if (!found) continue;
+        if (rule.w < 0 && negated(text, found.index)) continue;
+        add(rule.why, rule.w);
+      }
+
+      var h = hash(text);
+      var raw = 30 + total + ((h % 7) - 3);
+      var score = raw > 75 ? 75 + (raw - 75) * 0.7 : raw;
+      score = Math.max(1, Math.min(100, Math.round(score)));
+
+      reasons.sort(function (a, b) { return Math.abs(b.points) - Math.abs(a.points); });
+      var level = levelIndex(score);
+
+      return {
+        score: score,
+        level: level,
+        reasons: reasons.slice(0, 6),
+        advice: LEVELS[level].advice[(h >>> 3) % 3]
+      };
+    }
+
+
+
+  /* ---------- The page ---------- */
+
+  var $ = function (id) { return document.getElementById(id); };
+  var story = $("story"), time = $("time"), done = $("done"), msg = $("msg");
+  var go = $("go"), waitEl = $("wait"), result = $("result"), care = $("care"), copyBtn = $("copy");
+  var last = null;
+  var busy = false;
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // example links
+  EXAMPLES.forEach(function (ex, i) {
+    if (i > 0) $("examples").appendChild(document.createTextNode(" | "));
+    var a = document.createElement("a");
+    a.href = "#";
+    a.textContent = ex.label;
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      story.value = ex.text;
+      time.value = "";
+      done.value = "";
+      check();
+    });
+    $("examples").appendChild(a);
+  });
+
+  // scale table
+  LEVELS.forEach(function (l) {
+    var td = document.createElement("td");
+    td.textContent = l.name;
+    $("scale").rows[0].appendChild(td);
+  });
+
+  // visitor counter (only counts on this computer, it's a joke)
+  (function () {
+    var n = 1337;
+    try {
+      n = parseInt(localStorage.getItem("aic-visits"), 10);
+      n = (isNaN(n) ? 1337 : n) + 1;
+      localStorage.setItem("aic-visits", String(n));
+    } catch (e) { n = 1337; }
+    $("counter").textContent = ("000000" + n).slice(-6);
+  })();
+
+  function bar(score) {
+    var total = 20, filled = Math.round(score / 100 * total), s = "[";
+    for (var i = 0; i < total; i++) s += i < filled ? "#" : "-";
+    return s + "]";
+  }
+
+  function showResult(res) {
+    var L = LEVELS[res.level];
+    last = { score: res.score, name: L.name };
+    care.hidden = true;
+    result.hidden = false;
+
+    $("face").textContent = L.face;
+    $("big").textContent = "YOU ARE " + res.score + "% COOKED";
+    var v = $("verdict");
+    v.textContent = "Verdict: " + L.name;
+    v.className = res.level === 5 ? "blink" : "";
+    $("tagline").textContent = L.tagline;
+    $("bar").textContent = bar(res.score);
+
+    var cells = $("scale").rows[0].children;
+    for (var i = 0; i < cells.length; i++) cells[i].className = i === res.level ? "on" : "";
+
+    var list = $("why");
+    list.textContent = "";
+    if (res.reasons.length === 0) {
+      var li0 = document.createElement("li");
+      li0.textContent = "Nothing stood out. Add more details for a better guess.";
+      list.appendChild(li0);
+    } else {
+      res.reasons.forEach(function (r) {
+        var li = document.createElement("li");
+        li.textContent = (r.points > 0 ? "+" : "\u2212") + Math.abs(r.points) + "  " + r.why;
+        list.appendChild(li);
+      });
+    }
+
+    $("advice").textContent = res.advice;
+    copyBtn.textContent = "Copy result";
+    $("status").textContent = "You are " + res.score + " percent cooked. " + L.name + ". " + L.tagline;
+    result.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
+  }
+
+  function showCare() {
+    result.hidden = true;
+    care.hidden = false;
+    $("status").textContent = "Hold on. This one doesn't sound funny. Please read the message on the page.";
+    care.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
+  }
+
+  function check() {
+    if (busy) return;
+    msg.textContent = "";
+    story.removeAttribute("aria-invalid");
+    var res;
+    try {
+      res = assess(story.value, time.value, done.value);
+    } catch (err) {
+      msg.textContent = "Something broke. Try reloading the page.";
+      return;
+    }
+    if (res.error) {
+      msg.textContent = res.error;
+      story.setAttribute("aria-invalid", "true");
+      story.focus();
+      return;
+    }
+    if (res.serious) return showCare();
+
+    // fake loading bar, because computers used to be slow
+    result.hidden = true;
+    care.hidden = true;
+    if (calm) return showResult(res);
+
+    busy = true;
+    go.disabled = true;
+    waitEl.hidden = false;
+    var step = 0, steps = 10;
+    var timer = setInterval(function () {
+      step++;
+      var s = "";
+      for (var i = 0; i < steps; i++) s += i < step ? "#" : ".";
+      waitEl.textContent = "Cook-O-Tron 3000 is thinking...  " + s;
+      if (step >= steps) {
+        clearInterval(timer);
+        waitEl.hidden = true;
+        busy = false;
+        go.disabled = false;
+        showResult(res);
+      }
+    }, 110);
+  }
+
+  function reset() {
+    story.value = "";
+    time.value = "";
+    done.value = "";
+    msg.textContent = "";
+    result.hidden = true;
+    care.hidden = true;
+    last = null;
+    window.scrollTo(0, 0);
+    story.focus();
+  }
+
+  go.addEventListener("click", check);
+  $("again").addEventListener("click", reset);
+  $("care-again").addEventListener("click", reset);
+
+  story.addEventListener("input", function () {
+    msg.textContent = "";
+    story.removeAttribute("aria-invalid");
+  });
+  story.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      check();
+    }
+  });
+
+  copyBtn.addEventListener("click", function () {
+    if (!last) return;
+    var text = "I'm " + last.score + "% cooked (" + last.name + "). Check yours: " + location.href.split("#")[0];
+    var flash = function (label) {
+      copyBtn.textContent = label;
+      setTimeout(function () { copyBtn.textContent = "Copy result"; }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { flash("Copied!"); }, function () { flash("Couldn't copy"); });
+    } else {
+      flash("Couldn't copy");
+    }
+  });
+})();
+</script>
+</body>
+</html>
