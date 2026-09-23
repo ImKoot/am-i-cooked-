@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Am I cooked?</title>
+  <meta name="description" content="Describe your situation and find out how cooked you are. Runs entirely in your browser.">
+  <meta name="theme-color" content="#E4E9EC">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%80%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>Am I cooked?</h1>
+      <p class="lede">Describe what's going on. The thermometer will tell you how done you are.</p>
+    </header>
+
+    <form id="form" class="form" novalidate>
+      <label for="situation" class="field-label">What's your situation?</label>
+      <textarea
+        id="situation"
+        rows="4"
+        maxlength="600"
+        placeholder="I have a chem final tomorrow at 9 and I haven't opened the textbook."
+        aria-describedby="error"></textarea>
+      <p id="error" class="error" role="alert"></p>
+
+      <div id="examples" class="examples" role="group" aria-label="Example situations"></div>
+
+      <div class="options">
+        <label class="select-label">
+          <span>How long do you have?</span>
+          <select id="deadline">
+            <option value="">Not sure</option>
+            <option value="passed">It already passed</option>
+            <option value="hours">A few hours</option>
+            <option value="tomorrow">About a day</option>
+            <option value="days">A few days</option>
+            <option value="weeks">Weeks or more</option>
+            <option value="none">No deadline</option>
+          </select>
+        </label>
+        <label class="select-label">
+          <span>How much is done?</span>
+          <select id="progress">
+            <option value="">Not sure</option>
+            <option value="none">Nothing yet</option>
+            <option value="little">A little</option>
+            <option value="half">About half</option>
+            <option value="most">Most of it</option>
+            <option value="done">Basically done</option>
+          </select>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Check if I'm cooked</button>
+    </form>
+
+    <section class="gauge" id="gauge" aria-label="Doneness thermometer">
+      <div class="track">
+        <div class="bar"></div>
+        <div class="needle" id="needle"></div>
+      </div>
+      <ul class="levels" id="levels"></ul>
+    </section>
+
+    <p id="sr-status" class="sr-only" aria-live="polite"></p>
+
+    <section id="result" class="result" hidden>
+      <p class="score" aria-hidden="true"><span id="pct">0</span><span class="score-unit">% cooked</span></p>
+      <h2 id="verdict"></h2>
+      <p id="tagline" class="tagline"></p>
+
+      <h3>What tipped the scale</h3>
+      <ul id="factors" class="factors"></ul>
+
+      <h3>What to do now</h3>
+      <p id="advice" class="advice"></p>
+
+      <div class="actions">
+        <button type="button" id="copy" class="btn btn-ghost">Copy result</button>
+        <button type="button" id="reset" class="btn btn-ghost">Start over</button>
+      </div>
+    </section>
+
+    <section id="care" class="result care" hidden>
+      <h2>This isn't a cooked question.</h2>
+      <p>It sounds like you might be dealing with something serious. If you're in danger or thinking about hurting yourself, contact your local emergency number now (112 in the EU, 999 in the UK, 911 in the US) or reach out to someone you trust.</p>
+      <p>This site is a joke and can't help with that.</p>
+      <div class="actions">
+        <button type="button" id="care-reset" class="btn btn-ghost">Start over</button>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>Everything runs in your browser. Nothing you type is sent anywhere. For entertainment only.</p>
+    </footer>
+  </main>
+
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

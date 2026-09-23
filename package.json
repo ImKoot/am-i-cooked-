@@ -1,0 +1,14 @@
+{
+  "name": "am-i-cooked",
+  "version": "1.0.0",
+  "description": "Describe your situation. A doneness thermometer tells you how cooked you are.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
