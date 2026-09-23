@@ -45,13 +45,6 @@ To add your own rule, find the list called `RULES` and add a line like this:
 
 To change the toast messages or advice, edit the list called `LEVELS`.
 
-## Put it online (GitHub Pages)
-
-1. Upload `index.html` to a GitHub repo.
-2. Go to **Settings**, then **Pages**.
-3. Under **Source**, choose **Deploy from a branch**. Pick `main` and `/ (root)`, then save.
-4. Wait a minute or two. Your link will show at the top of that page.
-
 ## License
 
 MIT. You can use and change it however you like.
